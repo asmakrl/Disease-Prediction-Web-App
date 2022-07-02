@@ -1,18 +1,33 @@
 import pickle
-import xgboost as xgb
-import pandas as pd
 import streamlit as st
+#import xgboost as xgb
 
+# loading the trained model
+pickle_in = open('PD_classifier.pkl', 'rb') 
+classifier = pickle.load(pickle_in)
 
-parkinson_model = xgb.XGBClassifier()
-parkinson_model.load_model('xgb_model.json')
-
-#Caching the model for faster loading
-#@st.cache
-
-
-st.title("Parkinson's Disease Prediction")
+#Loading up the Regression model we created
+#model = xgb.XGBClassifier()
+#model.load_model('xgb_model.json')
+@st.cache()
+  
+# defining the function which will make the prediction using the data which the user inputs 
+def prediction(fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE):
     
+    parkinsons_prediction = classifier.predict([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])
+
+    if (parkinsons_prediction[0] == 1):
+
+        parkinson_diagnosis = "The person has Parkinson's disease"
+    else:
+        parkinson_diagnosis = "The person does not have Parkinson's disease"
+    
+    return parkinson_diagnosis
+
+#title
+st.title("Parkinson's Disease Prediction")
+
+# following lines create boxes in which user can enter data required to make prediction   
 col1, col2, col3, col4, col5 = st.columns(5)  
     
 with col1:
@@ -80,20 +95,13 @@ with col1:
         
 with col2:
     PPE = st.text_input('PPE')
-        
-    
-    
+
 # code for Prediction
-parkinsons_diagnosis = ''
+parkinson_prediction = ''
     
 # creating a button for Prediction    
 if st.button("Parkinson's Test Result"):
-    parkinsons_prediction = parkinson_model.predict([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])                          
-        
-if (parkinsons_prediction[0] == 1):
-    parkinsons_diagnosis = "The person has Parkinson's disease"
-else:
-    parkinsons_diagnosis = "The person does not have Parkinson's disease"
-        
-st.success(parkinsons_diagnosis)
-
+    
+    parkinson_prediction = prediction([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])
+    st.success('Your result is {}'.format(parkinson_prediction))
+    print(parkinson_prediction)
