@@ -1,26 +1,33 @@
-import pickle
+import pandas as pd
 import streamlit as st
-#import xgboost as xgb
-
+import xgboost as xgb
+import numpy as np
 # loading the trained model
-pickle_in = open('PD_classifier.pkl', 'rb') 
-classifier = pickle.load(pickle_in)
+#pickle_in = open('PD_classifier.pkl', 'rb') 
+#classifier = pickle.load(pickle_in)
 
 #Loading up the Regression model we created
-#model = xgb.XGBClassifier()
-#model.load_model('xgb_model.json')
+#model = xgb.Booster()
+#model.load_model('xgb_model.bin')
+
+model = xgb.XGBClassifier()
+
+model.load_model("xgb_model.bin")
+
 @st.cache()
-  
+#fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE
 # defining the function which will make the prediction using the data which the user inputs 
 def prediction(fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE):
-    
-    parkinsons_prediction = classifier.predict([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])
+    #data= np.array([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])
+    #m = xgb.DMatrix(data)
 
-    if (parkinsons_prediction[0] == 1):
+    parkinsons_prediction = model.predict([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])
 
-        parkinson_diagnosis = "The person has Parkinson's disease"
-    else:
+    if (parkinsons_prediction[0] == 0):
+
         parkinson_diagnosis = "The person does not have Parkinson's disease"
+    else:
+        parkinson_diagnosis = "The person has Parkinson's disease"
     
     return parkinson_diagnosis
 
@@ -96,12 +103,37 @@ with col1:
 with col2:
     PPE = st.text_input('PPE')
 
+
 # code for Prediction
 parkinson_prediction = ''
     
 # creating a button for Prediction    
 if st.button("Parkinson's Test Result"):
+    Shimmer_dB = float(Shimmer_dB)
+    APQ3 = float(APQ3)
+    Shimmer = float(Shimmer)
+    DDP = float(DDP)
+    PPQ = float(PPQ)
+    fo = float(fo)
+    fhi = float(fhi)
+    flo = float(flo)
+    Jitter_percent = float(Jitter_percent)
+    Jitter_Abs = float(Jitter_Abs)
+    RAP = float(RAP)
+    APQ5 = float(APQ5)
+    DDA = float(DDA)
+    NHR = float(NHR)
+    HNR = float(HNR)
+    APQ = float(APQ)
+    RPDE = float(RPDE)
+    DFA = float(DFA)
+    spread1 = float(spread1)
+    spread2 = float(spread2)
+    D2 = float(D2)
+    PPE = float(PPE)
     
-    parkinson_prediction = prediction([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])
+    parkinson_prediction = prediction(fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE)
+
     st.success('Your result is {}'.format(parkinson_prediction))
-    print(parkinson_prediction)
+   
+    
