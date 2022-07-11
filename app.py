@@ -2,24 +2,14 @@ import pandas as pd
 import streamlit as st
 import xgboost as xgb
 import numpy as np
-# loading the trained model
-#pickle_in = open('PD_classifier.pkl', 'rb') 
-#classifier = pickle.load(pickle_in)
-
-#Loading up the Regression model we created
-#model = xgb.Booster()
-#model.load_model('xgb_model.bin')
 
 model = xgb.XGBClassifier()
 
 model.load_model("xgb_model.bin")
 
 @st.cache()
-#fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE
 # defining the function which will make the prediction using the data which the user inputs 
 def prediction(fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE):
-    #data= np.array([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])
-    #m = xgb.DMatrix(data)
 
     parkinsons_prediction = model.predict([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])
 
